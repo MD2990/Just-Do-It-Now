@@ -58,7 +58,7 @@ export default function Edit({ isConnected }) {
 					<Text
 						overflow='scroll'
 						textOverflow='ellipsis'
-						shadow='md'
+						shadow='sm'
 						p='4'
 						maxW='40rem'
 						maxH='10rem'
