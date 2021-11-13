@@ -13,7 +13,7 @@
     "@chakra-ui/react": "^1.6.6",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "framer-motion": "^4.1.17",
     "mongodb": "^4.1.1",
     "mongoose": "^6.0.2",
