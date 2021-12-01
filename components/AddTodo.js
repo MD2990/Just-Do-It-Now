@@ -29,36 +29,37 @@ export default function AddTodo () {
 		state.todos = getData.data; // update the state with the new date
 	};
 	return (
-		<Center m='5%'>
-			<Wrap>
-				<WrapItem>
-					<form onSubmit={handleSubmit}>
-						<Input
-							ref={ref}
-							fontSize='xl'
-							rounded='full'
-							textAlign='center'
-							size='lg'
-							isInvalid
-							isRequired
-							errorBorderColor='green.200'
-							placeholder='Add New Todo'
-						/>
-						<Stack>
-							<Button
-								fontSize='xl'
-								mt='2'
-								size='lg'
-								rounded='full'
-								type='submit'
-								colorScheme='teal'
-								leftIcon={<MdAlarmAdd fontSize='2.5rem' />}>
-								Add
-							</Button>
-						</Stack>
-					</form>
-				</WrapItem>
-			</Wrap>
-		</Center>
-	);
+    <Center mt="5%" mb="1%"  >
+      <Wrap justify='center'  >
+        <WrapItem >
+          <form onSubmit={handleSubmit}>
+            <Input
+              ref={ref}
+              fontSize="xl"
+              rounded="full"
+              textAlign="center"
+              size="lg"
+              isInvalid
+              isRequired
+              errorBorderColor="green.200"
+              placeholder="Add New Todo"
+            />
+            <Stack>
+              <Button
+                fontSize="xl"
+                mt="2"
+                size="lg"
+                rounded="full"
+                type="submit"
+                colorScheme="teal"
+                leftIcon={<MdAlarmAdd fontSize="2.5rem" />}
+              >
+                Add
+              </Button>
+            </Stack>
+          </form>
+        </WrapItem>
+      </Wrap>
+    </Center>
+  );
 };
