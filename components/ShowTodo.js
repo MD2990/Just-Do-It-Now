@@ -8,14 +8,17 @@ import {
   HStack,
   Wrap,
   WrapItem,
+  Text,
 } from "@chakra-ui/layout";
 import { useBreakpointValue } from "@chakra-ui/media-query";
+import { useToast } from "@chakra-ui/toast";
 import { useRouter } from "next/router";
 import React from "react";
 import { FcAlarmClock, FcCheckmark } from "react-icons/fc";
 import { useSnapshot } from "valtio";
 import { colors } from "../lib/constent";
 import state from "../store";
+import { MyToast } from "./Util";
 
 export default function ShowTodo() {
   const Box_Font_Size = useBreakpointValue({
@@ -26,9 +29,10 @@ export default function ShowTodo() {
   });
   const router = useRouter();
   const snap = useSnapshot(state);
+  const toast = useToast();
 
   return (
-    <Wrap justify="center" spacing="4" >
+    <Wrap justify="center" spacing="4">
       {snap.todos.map((todo, index) => {
         return (
           <WrapItem key={todo._id}>
@@ -104,7 +108,7 @@ export default function ShowTodo() {
                 <HStack spacing="2" p="4" maxW="20rem">
                   <Button
                     w={"full"}
-                    bg={"tomato"}
+                    bg={todo.isDone ? "green.500" : "tomato"}
                     color={"white"}
                     rounded={"full"}
                     _hover={{
@@ -116,16 +120,29 @@ export default function ShowTodo() {
                         (to) => todo._id !== to._id
                       );
 
-                      await fetch("/api/delTodo", {
+                       fetch("/api/delTodo", {
                         method: "DELETE",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(todo._id),
-                      });
-                      const getData = await fetch("/api/todos").then(
-                        (response) => response.json()
-                      );
-
-                      state.todos = getData.data;
+                      })
+                        .then((response) => {
+                          if (response.ok) {
+                            MyToast({ toast: toast, deleted: true });
+                          } else {
+                            MyToast({ toast: toast, error: true });
+                            // we must cancel the applied filter
+                            state.todos = snap.todos.filter(
+                              (to) => to._id !== null
+                            );
+                          }
+                        })
+                        .catch((error) => {
+                          MyToast({ toast: toast, error: true });
+                          // we must cancel the applied filter
+                          state.todos = snap.todos.filter(
+                            (to) => to._id !== null
+                          );
+                        });
                     }}
                   >
                     Delete
@@ -133,19 +150,32 @@ export default function ShowTodo() {
 
                   <Button
                     w={"full"}
-                    bg={"blackAlpha.500"}
+                    bg={todo.isDone ? "green.500" : "gray.500"}
                     color={"white"}
                     rounded={"full"}
                     _hover={{
                       transform: "translateY(-2px)",
                       boxShadow: "lg",
                     }}
-                    onClick={() => router.push(`/edit/${todo._id}`)}
+                    onClick={() => {
+                      state.todoName = todo.name;
+                      router.push(`/edit/${todo._id}`);
+                    }}
                   >
                     Edit
                   </Button>
                 </HStack>
               </Center>
+              <Text
+                fontSize={["xx-small", "xs", "sm", "md"]}
+                color={todo.isDone ? "green" : "gray.500"}
+                fontWeight="semi-bold"
+                textShadow={
+                  todo.isDone ? "0px 0px 6px #90EE90" : "0px 0px 10px #A9A9A9"
+                }
+              >
+                {todo.date}
+              </Text>
             </Box>
           </WrapItem>
         );
