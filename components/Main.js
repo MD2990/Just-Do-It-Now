@@ -16,8 +16,8 @@ import AddTodo from "./AddTodo";
 import ShowTodo from "./ShowTodo";
 import { useBreakpointValue } from "@chakra-ui/media-query";
 
-const Boxes = ({ children, notDone, done }) => (
-  <WrapItem>
+const Boxes = ({ children, notDone, done, filter }) => (
+  <WrapItem onClick={filter} cursor='pointer' >
     <Box
       p={[1, 2, 3, 4]}
       isTruncated
@@ -42,7 +42,8 @@ export default function Main({ data }) {
 
   useEffect(() => {
     state.todos = data.data;
-  }, [data]);
+    state.allTodosLength = data.data.length;
+  }, [data.data]);
 
   return (
     <Center m="4" p="4">
@@ -83,21 +84,39 @@ export default function Main({ data }) {
 
         <AddTodo />
 
-        {snap.todos.length > 0 && (
+        {snap.allTodosLength > 0 && (
           <Wrap justify="center">
-            <Boxes>
+            <Boxes
+              filter={() => {
+                state.todos = data.data;
+              }}
+            >
               <FcTodoList size={size} />
-              {snap.todos.length}
+              {state.allTodosLength}
             </Boxes>
 
-            <Boxes done>
+            <Boxes
+              done
+              filter={() => {
+                state.todos = data.data;
+                state.allTodosLength = state.todos.length;
+                state.todos = state.todos.filter((t) => t.isDone);
+              }}
+            >
               <FcOk size={size} />
               {snap.todos.filter((t) => t.isDone).length}
             </Boxes>
 
-            <Boxes notDone>
+            <Boxes
+              notDone
+              filter={() => {
+                state.todos = data.data;
+                state.allTodosLength = state.todos.length;
+                state.todos = state.todos.filter((t) => !t.isDone);
+              }}
+            >
               <FcSportsMode size={size} />
-              {snap.todos.filter((t) => !t.isDone).length}
+              {state.todos.filter((t) => !t.isDone).length}
             </Boxes>
           </Wrap>
         )}
@@ -116,7 +135,7 @@ export default function Main({ data }) {
               color="green.400"
               textShadow="0px 0px 80px  green"
               whiteSpace="nowrap"
-              p='2'
+              p="2"
             >
               <Text
                 as="span"

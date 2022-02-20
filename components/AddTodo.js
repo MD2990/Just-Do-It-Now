@@ -42,6 +42,7 @@ export default function AddTodo() {
     );
 
     state.todos = getData.data // update the state with the new data
+    state.allTodosLength = snap.todos.length+1; // update the state with the new data
   };
   return (
     <Center mt="5%" mb="1%">

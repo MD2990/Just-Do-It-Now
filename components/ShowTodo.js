@@ -119,8 +119,9 @@ export default function ShowTodo() {
                       state.todos = state.todos.filter(
                         (to) => todo._id !== to._id
                       );
+                      state.allTodosLength = snap.todos.length - 1;
 
-                       fetch("/api/delTodo", {
+                      fetch("/api/delTodo", {
                         method: "DELETE",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(todo._id),
@@ -134,6 +135,7 @@ export default function ShowTodo() {
                             state.todos = snap.todos.filter(
                               (to) => to._id !== null
                             );
+                            state.allTodosLength = snap.todos.length - 1;
                           }
                         })
                         .catch((error) => {
