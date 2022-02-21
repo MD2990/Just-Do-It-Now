@@ -4,9 +4,10 @@ const state = proxy({
   todos: [],
   todoName: "",
   newTodo: "",
-  allTodosLength: null,
-  notDone: [],
-  done: [],
+  allTodos: [],
+  doneNumber: 0,
+  notDoneNumber: 0,
+  total: 0,
 });
 
 export default state;

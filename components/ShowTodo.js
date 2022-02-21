@@ -13,7 +13,7 @@ import {
 import { useBreakpointValue } from "@chakra-ui/media-query";
 import { useToast } from "@chakra-ui/toast";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import { FcAlarmClock, FcCheckmark } from "react-icons/fc";
 import { useSnapshot } from "valtio";
 import { colors } from "../lib/constent";
@@ -67,6 +67,14 @@ export default function ShowTodo() {
                   onClick={async () => {
                     const done = (state.todos[index].isDone = !todo.isDone);
 
+                    if (!todo.isDone) {
+                      state.doneNumber++;
+                      state.notDoneNumber--;
+                    } else {
+                      state.doneNumber--;
+                      state.notDoneNumber++;
+                    }
+
                     await fetch("/api/doneTodo?_id=" + todo._id, {
                       method: "PUT",
                       body: JSON.stringify({ isDone: done }),
@@ -116,10 +124,30 @@ export default function ShowTodo() {
                       boxShadow: "lg",
                     }}
                     onClick={async () => {
+                      // filter todo List for UI
                       state.todos = state.todos.filter(
                         (to) => todo._id !== to._id
                       );
-                      state.allTodosLength = snap.todos.length - 1;
+
+                      // filter todo List for a copy
+                      state.allTodos = state.allTodos.filter(
+                        (to) => todo._id !== to._id
+                      );
+
+                      // if will not check the length the filter will return empty UI when a filter is applied and we delete the last todo
+                      // now if we delete the last done todo the UI will jump to the undone todo list and vice versa
+                      // and if empty the UI will jump to the "Proactive and add some todos to your list " as simple msg
+                      state.todos.length < 1 && (state.todos = state.allTodos);
+
+                      // just for user experience and not  do some hard work here
+                      state.total--;
+                      // subtract the todo from the total of done todo if user delete  the done todo
+                      if (!todo.isDone) {
+                        state.notDoneNumber--;
+                      } else {
+                        // subtract the todo from the total of undone todo if user delete  the undone todo
+                        state.doneNumber--;
+                      }
 
                       fetch("/api/delTodo", {
                         method: "DELETE",
@@ -131,17 +159,22 @@ export default function ShowTodo() {
                             MyToast({ toast: toast, deleted: true });
                           } else {
                             MyToast({ toast: toast, error: true });
-                            // we must cancel the applied filter
-                            state.todos = snap.todos.filter(
+                            // we must cancel the applied filter for UI and for a copy
+                            state.todos = state.todos.filter(
                               (to) => to._id !== null
                             );
-                            state.allTodosLength = snap.todos.length - 1;
+                            state.allTodos = state.allTodos.filter(
+                              (to) => to._id !== null
+                            );
                           }
                         })
                         .catch((error) => {
                           MyToast({ toast: toast, error: true });
-                          // we must cancel the applied filter
-                          state.todos = snap.todos.filter(
+                          // we must cancel the applied filter for UI and for a copy
+                          state.todos = state.todos.filter(
+                            (to) => to._id !== null
+                          );
+                          state.allTodos = state.allTodos.filter(
                             (to) => to._id !== null
                           );
                         });

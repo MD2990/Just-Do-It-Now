@@ -17,7 +17,7 @@ import ShowTodo from "./ShowTodo";
 import { useBreakpointValue } from "@chakra-ui/media-query";
 
 const Boxes = ({ children, notDone, done, filter }) => (
-  <WrapItem onClick={filter} cursor='pointer' >
+  <WrapItem onClick={filter} cursor="pointer">
     <Box
       p={[1, 2, 3, 4]}
       isTruncated
@@ -41,8 +41,20 @@ export default function Main({ data }) {
   const snap = useSnapshot(state);
 
   useEffect(() => {
+    // save todos from server
     state.todos = data.data;
-    state.allTodosLength = data.data.length;
+
+    // get done todos
+    state.doneNumber = data.data.filter((t) => t.isDone).length;
+
+    // get not done todos
+    state.notDoneNumber = data.data.filter((t) => !t.isDone).length;
+
+    // get total todos
+    state.total = data.data.length;
+
+    // save a copy of todos to return back when user click  all todos button and also when change filter
+    state.allTodos = state.todos;
   }, [data.data]);
 
   return (
@@ -84,44 +96,51 @@ export default function Main({ data }) {
 
         <AddTodo />
 
-        {snap.allTodosLength > 0 && (
+        {state.allTodos.length && (
           <Wrap justify="center">
             <Boxes
               filter={() => {
-                state.todos = data.data;
+                state.todos = state.allTodos;
               }}
             >
               <FcTodoList size={size} />
-              {state.allTodosLength}
+              {state.total}
             </Boxes>
 
-            <Boxes
-              done
-              filter={() => {
-                state.todos = data.data;
-                state.allTodosLength = state.todos.length;
-                state.todos = state.todos.filter((t) => t.isDone);
-              }}
-            >
-              <FcOk size={size} />
-              {snap.todos.filter((t) => t.isDone).length}
-            </Boxes>
+            {snap.doneNumber > 0 && (
+              <Boxes
+                done
+                filter={() => {
+                  state.todos = state.allTodos;
+                  state.todos = state.todos.filter((t) => t.isDone);
+            
+                }}
+              >
+                <FcOk size={size} />
+                {snap.doneNumber}
+              </Boxes>
+            )}
 
-            <Boxes
-              notDone
-              filter={() => {
-                state.todos = data.data;
-                state.allTodosLength = state.todos.length;
-                state.todos = state.todos.filter((t) => !t.isDone);
-              }}
-            >
-              <FcSportsMode size={size} />
-              {state.todos.filter((t) => !t.isDone).length}
-            </Boxes>
+            {snap.notDoneNumber > 0 && (
+              <Boxes
+                notDone
+                filter={() => {
+                  // clear allTodos filter
+                  state.todos = state.allTodos;
+
+                  // filter notDone
+                  state.todos = state.todos.filter((t) => !t.isDone);
+                 
+                }}
+              >
+                <FcSportsMode size={size} />
+                {snap.notDoneNumber}
+              </Boxes>
+            )}
           </Wrap>
         )}
 
-        {snap.todos.length === 0 && (
+        {!snap.allTodos.length && (
           <Box pt="8">
             <Text
               fontWeight="bold"

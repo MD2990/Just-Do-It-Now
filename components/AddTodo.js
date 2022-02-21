@@ -14,8 +14,6 @@ export default function AddTodo() {
   const ref = useRef("");
   const toast = useToast();
 
- 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -41,8 +39,11 @@ export default function AddTodo() {
       response.json()
     );
 
-    state.todos = getData.data // update the state with the new data
-    state.allTodosLength = snap.todos.length+1; // update the state with the new data
+    state.todos = getData.data; // update the state with the new data
+    state.total++; // update the total number of todos 
+    state.notDoneNumber++; // add the new todo to the total number of not done todos by default it is not done
+    state.allTodos = getData.data; // update the copy state with the new data
+    
   };
   return (
     <Center mt="5%" mb="1%">

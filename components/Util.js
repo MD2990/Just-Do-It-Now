@@ -1,18 +1,11 @@
 import { Box, Center } from "@chakra-ui/layout";
 import { Text } from "@chakra-ui/react";
 import React from "react";
-import Loader from "react-loader-spinner";
-import { useToast } from "@chakra-ui/react";
+import { Audio } from "react-loader-spinner";
 export default function TheLoader() {
   return (
     <Center mt="20%" p="4" mx="4">
-      <Loader
-        type="Puff"
-        color="#00BFFF"
-        height={100}
-        width={100}
-        timeout={5000} //3 secs
-      />
+      <Audio height="100" width="100" color="grey" ariaLabel="loading" />
     </Center>
   );
 }
