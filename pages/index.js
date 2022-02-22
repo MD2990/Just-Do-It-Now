@@ -35,6 +35,5 @@ export async function getStaticProps() {
     props: {
       todo,
     },
-    revalidate: 1,
   };
 }
