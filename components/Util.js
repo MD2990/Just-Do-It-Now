@@ -57,11 +57,36 @@ export function MyToast({
               {error && "Something went wrong please try again"}
               {success && "Added successfully"}
               {update && "Updated successfully"}
-                {deleted && "Deleted successfully"}
+              {deleted && "Deleted successfully"}
             </Text>
           </Box>
         ),
       })}
     </>
   );
+}
+
+// create a function to get a value from local storage and return it if the window is not undefined
+export function getLocalStorage(key) {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem(key);
+  }
+}
+
+// create a function to check if the window defined than to set a value in the local storage
+
+export function setLocalStorage(key, value) {
+  // check if the window is defined
+  if (typeof window !== "undefined") {
+    // set the value in the local storage
+    localStorage.setItem(key, value.toString().trim());
+  }
+}
+// create a function to check if the window defined than to remove a value in the local storage
+export function removeLocalStorage(key) {
+  // check if the window is defined
+  if (typeof window !== "undefined") {
+    // remove the value in the local storage
+    localStorage.removeItem(key);
+  }
 }

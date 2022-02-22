@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/router";
 import { FaSave } from "react-icons/fa";
 
@@ -8,30 +8,27 @@ import {
   Center,
   Input,
   Text,
-  HStack,
   Wrap,
-  Box,
   Divider,
 } from "@chakra-ui/react";
 import { RiArrowGoBackLine } from "react-icons/ri";
-import connectToDatabase from "../../util/mongodb";
-import Loader from "react-loader-spinner";
-import useSWR from "swr";
 import state from "../../store";
 import { useToast } from "@chakra-ui/toast";
 
 import { useSnapshot } from "valtio";
-import TheLoader, { Error, MyToast } from "../../components/Util";
-var mongodb = require("mongodb");
-export default function Edit({ isConnected }) {
+import {
+  getLocalStorage,
+  MyToast,
+  removeLocalStorage,
+} from "../../components/Util";
+
+export default function Edit() {
   const router = useRouter();
   const { id } = router.query;
   const toast = useToast({});
 
   const snapshot = useSnapshot(state);
-  /*   useEffect(() => {
-    state.todoName = isConnected ? isConnected.name : "";
-  }, [isConnected]); */
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,9 +44,10 @@ export default function Edit({ isConnected }) {
       }).then((response) => {
         if (response.ok) {
           MyToast({ toast: toast, update: true });
+          removeLocalStorage(id);
           router.back();
         } else {
-          return MyToast({ toast: toast, error: true });
+           MyToast({ toast: toast, error: true });
         }
       });
     } catch (error) {
@@ -90,7 +88,11 @@ export default function Edit({ isConnected }) {
             rounded="full"
             textAlign="center"
             size="lg"
-            defaultValue={snapshot.todoName}
+            defaultValue={
+              snapshot.todoName ||
+              getLocalStorage(id) 
+              
+            }
             isRequired
             shadow="2xl"
             errorBorderColor="teal.300"
@@ -118,7 +120,9 @@ export default function Edit({ isConnected }) {
                 rounded="full"
                 colorScheme="teal"
                 leftIcon={<RiArrowGoBackLine fontSize="2.1rem" />}
-                onClick={() => router.back()}
+                onClick={() => {
+                     removeLocalStorage(id);
+                  router.back();}}
               >
                 Cancel
               </Button>
@@ -128,61 +132,4 @@ export default function Edit({ isConnected }) {
       </VStack>
     </Center>
   );
-}
-
-/* export const getStaticProps = async ({ params }) => {
-  const { db } = await connectToDatabase();
-  const data = await db
-    .collection("todo")
-    .findOne({ _id: mongodb.ObjectId(params.id) });
-  const isConnected = await JSON.parse(JSON.stringify(data));
-
-  if (!data) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      isConnected,
-    },
-    revalidate: 1,
-  };
-}; */
-/* export async function getStaticPaths() {
-  const { db } = await connectToDatabase();
-  const data = await db.collection("todo").find({}).toArray();
-  const isConnected = await JSON.parse(JSON.stringify(data));
-
-  const paths = isConnected.map((c) => ({
-    params: { id: c._id.toString() },
-  }));
-
-  // We'll pre-render only these paths at build time.
-  // { fallback: false } means other routes should 404.
-  return { paths, fallback: true };
-} */
-
-export async function getServerSideProps({ params }) {
-  //const client = await connectToDatabase();
-
-  // client.db() will be the default database passed in the MONGODB_URI
-  // You can change the database by calling the client.db() function and specifying a database like:
-  // const db = client.db("myDatabase");
-  // Then you can execute queries against your database like so:
-  // db.find({}) or any of the MongoDB Node Driver commands
-  const { db } = await connectToDatabase();
-  const data = await db
-    .collection("todo")
-    .findOne({ _id: mongodb.ObjectId(params.id) });
-
-  const isConnected = JSON.parse(JSON.stringify(data));
-
-  return {
-    props: { isConnected },
-  };
 }

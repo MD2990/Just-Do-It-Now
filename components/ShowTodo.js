@@ -18,7 +18,7 @@ import { FcAlarmClock, FcCheckmark } from "react-icons/fc";
 import { useSnapshot } from "valtio";
 import { colors } from "../lib/constent";
 import state from "../store";
-import { MyToast } from "./Util";
+import { MyToast, setLocalStorage } from "./Util";
 
 export default function ShowTodo() {
   const Box_Font_Size = useBreakpointValue({
@@ -195,6 +195,7 @@ export default function ShowTodo() {
                     onClick={() => {
                       state.todoName = todo.name;
                       router.push(`/edit/${todo._id}`);
+                      setLocalStorage(todo._id ,todo.name);
                     }}
                   >
                     Edit
