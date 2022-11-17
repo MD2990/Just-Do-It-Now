@@ -1,20 +1,19 @@
 import { Box, Center } from "@chakra-ui/layout";
 import { Text } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import React from "react";
-import { Audio } from "react-loader-spinner";
-export default function TheLoader() {
-  return (
-    <Center mt="20%" p="4" mx="4">
-      <Audio height="100" width="100" color="grey" ariaLabel="loading" />
-    </Center>
-  );
-}
 
 export function Error() {
+  const router = useRouter();
   return (
-    <Center mt="20%" p="4" mx="4">
+    <Center
+      mt="20%"
+      p="4"
+      mx="4"
+      onClick={() => router.replace("/")}
+      cursor="pointer"
+    >
       <Text
-        isTruncated
         fontFamily="monospace"
         fontSize={["xs", "sm", "md", "xl", "3xl"]}
         overflowWrap="break-word"
@@ -66,27 +65,7 @@ export function MyToast({
   );
 }
 
-// create a function to get a value from local storage and return it if the window is not undefined
-export function getLocalStorage(key) {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem(key);
-  }
-}
 
-// create a function to check if the window defined than to set a value in the local storage
 
-export function setLocalStorage(key, value) {
-  // check if the window is defined
-  if (typeof window !== "undefined") {
-    // set the value in the local storage
-    localStorage.setItem(key, value.toString().trim());
-  }
-}
-// create a function to check if the window defined than to remove a value in the local storage
-export function removeLocalStorage(key) {
-  // check if the window is defined
-  if (typeof window !== "undefined") {
-    // remove the value in the local storage
-    localStorage.removeItem(key);
-  }
-}
+
+

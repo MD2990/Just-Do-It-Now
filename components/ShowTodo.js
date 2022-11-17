@@ -13,12 +13,12 @@ import {
 import { useBreakpointValue } from "@chakra-ui/media-query";
 import { useToast } from "@chakra-ui/toast";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React from "react";
 import { FcAlarmClock, FcCheckmark } from "react-icons/fc";
 import { useSnapshot } from "valtio";
 import { colors } from "../lib/constent";
 import state from "../store";
-import { MyToast, setLocalStorage } from "./Util";
+import { MyToast } from "./Util";
 
 export default function ShowTodo() {
   const Box_Font_Size = useBreakpointValue({
@@ -70,9 +70,18 @@ export default function ShowTodo() {
                     if (!todo.isDone) {
                       state.doneNumber++;
                       state.notDoneNumber--;
+                      state.todos = state.todos.filter((t) => !t.isDone);
+
+                      // if all are done,so we will show all with no filter
+                      if (state.todos.length === 0)
+                        state.todos = state.allTodos;
                     } else {
                       state.doneNumber--;
                       state.notDoneNumber++;
+                      state.todos = state.todos.filter((t) => t.isDone);
+                      // if all are done,so we will show all with no filter
+                      if (state.todos.length === 0)
+                        state.todos = state.allTodos;
                     }
 
                     await fetch("/api/doneTodo?_id=" + todo._id, {
@@ -90,13 +99,12 @@ export default function ShowTodo() {
                       <FcAlarmClock fontSize="5.5rem" />
                     )
                   }
-                  alt={"Todo"}
+                  alt={todo.name}
                 />
               </Flex>
 
               <Center>
                 <Heading
-                  isTruncated
                   textOverflow="ellipsis"
                   overflow="hidden"
                   maxW="20rem"
@@ -115,8 +123,10 @@ export default function ShowTodo() {
               <Center>
                 <HStack spacing="2" p="4" maxW="20rem">
                   <Button
+                    fontSize={["xs", "sm"]}
+                    size={["xs", "sm"]}
                     w={"full"}
-                    bg={todo.isDone ? "green.500" : "tomato"}
+                    bg={"red.400"}
                     color={"white"}
                     rounded={"full"}
                     _hover={{
@@ -124,79 +134,24 @@ export default function ShowTodo() {
                       boxShadow: "lg",
                     }}
                     onClick={async () => {
-                      // filter todo List for UI
-                      state.todos = state.todos.filter(
-                        (to) => todo._id !== to._id
-                      );
-
-                      // filter todo List for a copy
-                      state.allTodos = state.allTodos.filter(
-                        (to) => todo._id !== to._id
-                      );
-
-                      // if will not check the length the filter will return empty UI when a filter is applied and we delete the last todo
-                      // now if we delete the last done todo the UI will jump to the undone todo list and vice versa
-                      // and if empty the UI will jump to the "Proactive and add some todos to your list " as simple msg
-                      state.todos.length < 1 && (state.todos = state.allTodos);
-
-                      // just for user experience and not  do some hard work here
-                      state.total--;
-                      // subtract the todo from the total of done todo if user delete  the done todo
-                      if (!todo.isDone) {
-                        state.notDoneNumber--;
-                      } else {
-                        // subtract the todo from the total of undone todo if user delete  the undone todo
-                        state.doneNumber--;
-                      }
-
-                      fetch("/api/delTodo", {
-                        method: "DELETE",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(todo._id),
-                      })
-                        .then((response) => {
-                          if (response.ok) {
-                            MyToast({ toast: toast, deleted: true });
-                          } else {
-                            MyToast({ toast: toast, error: true });
-                            // we must cancel the applied filter for UI and for a copy
-                            state.todos = state.todos.filter(
-                              (to) => to._id !== null
-                            );
-                            state.allTodos = state.allTodos.filter(
-                              (to) => to._id !== null
-                            );
-                          }
-                        })
-                        .catch((error) => {
-                          MyToast({ toast: toast, error: true });
-                          // we must cancel the applied filter for UI and for a copy
-                          state.todos = state.todos.filter(
-                            (to) => to._id !== null
-                          );
-                          state.allTodos = state.allTodos.filter(
-                            (to) => to._id !== null
-                          );
-                        });
+                      handelDelete(todo);
                     }}
                   >
                     Delete
                   </Button>
 
                   <Button
+                    fontSize={["xs", "sm"]}
+                    size={["xs", "sm"]}
                     w={"full"}
-                    bg={todo.isDone ? "green.500" : "gray.500"}
+                    bg={"gray.500"}
                     color={"white"}
                     rounded={"full"}
                     _hover={{
                       transform: "translateY(-2px)",
                       boxShadow: "lg",
                     }}
-                    onClick={() => {
-                      state.todoName = todo.name;
-                      router.push(`/edit/${todo._id}`);
-                      setLocalStorage(todo._id ,todo.name);
-                    }}
+                    onClick={handelEdit(todo, router)}
                   >
                     Edit
                   </Button>
@@ -218,4 +173,55 @@ export default function ShowTodo() {
       })}
     </Wrap>
   );
+
+  function handelDelete(todo) {
+    state.todos = state.todos.filter((to) => todo._id !== to._id);
+
+    // filter todo List for a copy
+    state.allTodos = state.allTodos.filter((to) => todo._id !== to._id);
+
+    // if will not check the length the filter will return empty UI when a filter is applied and we delete the last todo
+    // now if we delete the last done todo the UI will jump to the undone todo list and vice versa
+    // and if empty the UI will jump to the "Proactive and add some todos to your list " as simple msg
+    state.todos.length < 1 && (state.todos = state.allTodos);
+
+    // just for user experience and not  do some hard work here
+    state.total--;
+    // subtract the todo from the total of done todo if user delete  the done todo
+    if (!todo.isDone) {
+      state.notDoneNumber--;
+    } else {
+      // subtract the todo from the total of undone todo if user delete  the undone todo
+      state.doneNumber--;
+    }
+
+    fetch("/api/delTodo", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(todo._id),
+    })
+      .then((response) => {
+        if (response.ok) {
+          MyToast({ toast: toast, deleted: true });
+        } else {
+          MyToast({ toast: toast, error: true });
+          // we must cancel the applied filter for UI and for a copy
+          state.todos = state.todos.filter((to) => to._id !== null);
+          state.allTodos = state.allTodos.filter((to) => to._id !== null);
+        }
+      })
+      .catch((error) => {
+        MyToast({ toast: toast, error: true });
+        // we must cancel the applied filter for UI and for a copy
+        state.todos = state.todos.filter((to) => to._id !== null);
+        state.allTodos = state.allTodos.filter((to) => to._id !== null);
+      });
+  }
 }
+function handelEdit(todo, router) {
+  return () => {
+    state.todoName = todo.name;
+    router.push(`/edit/${todo._id}`);
+  };
+}
+

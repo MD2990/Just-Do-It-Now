@@ -56,10 +56,10 @@ export default function AddTodo() {
               onChange={(e) => {
                 state.newTodo = e.target.value;
               }}
-              fontSize="xl"
-              rounded="full"
+              fontSize={["sm", "md", "lg"]}
+              size={["xs", "sm", "md", "lg"]}
+              rounded="lg"
               textAlign="center"
-              size="lg"
               isInvalid
               isRequired
               errorBorderColor="green.200"
@@ -67,14 +67,14 @@ export default function AddTodo() {
             />
             <Stack>
               <Button
-                fontSize="xl"
                 disabled={snap.newTodo === ""}
                 mt="2"
-                size="lg"
-                rounded="full"
+                fontSize={["sm", "md", "2xl"]}
+                size={["xs", "sm", "md", "lg"]}
+                rounded="lg"
                 type="submit"
                 colorScheme="teal"
-                leftIcon={<MdAlarmAdd fontSize="2.5rem" />}
+                leftIcon={<MdAlarmAdd  />}
               >
                 Add
               </Button>

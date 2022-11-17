@@ -1,12 +1,4 @@
-import {
-  Box,
-  Center,
-  Text,
-  Wrap,
-  WrapItem,
-  VStack,
-  HStack,
-} from "@chakra-ui/react";
+import { Box, Center, Text, Wrap, VStack, HStack } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FcOk, FcSportsMode, FcTodoList } from "react-icons/fc";
 import { useSnapshot } from "valtio";
@@ -15,26 +7,9 @@ import { colors } from "../lib/constent";
 import AddTodo from "./AddTodo";
 import ShowTodo from "./ShowTodo";
 import { useBreakpointValue } from "@chakra-ui/media-query";
+import { Boxes } from "./Boxes";
 
-const Boxes = ({ children, notDone, done, filter }) => (
-  <WrapItem onClick={filter} cursor="pointer">
-    <Box
-      p={[1, 2, 3, 4]}
-      isTruncated
-      borderRadius="3xl"
-      shadow="lg"
-      textAlign="center"
-      fontSize={["lg", "2xl", "3xl", "4xl"]}
-      fontFamily="sans"
-      fontWeight="bold"
-      color={notDone ? "red.400" : done ? "green.400" : "blue.300"}
-    >
-      {children}
-    </Box>
-  </WrapItem>
-);
-
-export default function Main({ data }) {
+export default function Main({ data, done, notDone }) {
   const size = "5rem";
   const Font_Size = () =>
     useBreakpointValue({ base: "3xl", lg: "9xl", md: "7xl", sm: "5xl" });
@@ -42,20 +17,20 @@ export default function Main({ data }) {
 
   useEffect(() => {
     // save todos from server
-    state.todos = data.data;
+    state.todos = data;
 
     // get done todos
-    state.doneNumber = data.data.filter((t) => t.isDone).length;
+    state.doneNumber = done;
 
     // get not done todos
-    state.notDoneNumber = data.data.filter((t) => !t.isDone).length;
+    state.notDoneNumber = notDone;
 
     // get total todos
-    state.total = data.data.length;
+    state.total = data.length;
 
     // save a copy of todos to return back when user click  all todos button and also when change filter
     state.allTodos = state.todos;
-  }, [data.data]);
+  }, [data, done, notDone]);
 
   return (
     <Center m="4" p="4">
@@ -78,7 +53,6 @@ export default function Main({ data }) {
             fontWeight="bold"
             color={colors.green}
             textOverflow="ellipsis"
-            isTruncated
             fontFamily="sans-serif"
           >
             UST DO I
@@ -99,12 +73,14 @@ export default function Main({ data }) {
         {state.allTodos.length && (
           <Wrap justify="center">
             <Boxes
+              color="blue.300"
               filter={() => {
                 state.todos = state.allTodos;
               }}
             >
               <FcTodoList size={size} />
-              {state.total}
+
+              <Text>{snap.total}</Text>
             </Boxes>
 
             {snap.doneNumber > 0 && (
@@ -113,11 +89,10 @@ export default function Main({ data }) {
                 filter={() => {
                   state.todos = state.allTodos;
                   state.todos = state.todos.filter((t) => t.isDone);
-            
                 }}
               >
                 <FcOk size={size} />
-                {snap.doneNumber}
+                <Text>{snap.doneNumber}</Text>
               </Boxes>
             )}
 
@@ -130,11 +105,10 @@ export default function Main({ data }) {
 
                   // filter notDone
                   state.todos = state.todos.filter((t) => !t.isDone);
-                 
                 }}
               >
                 <FcSportsMode size={size} />
-                {snap.notDoneNumber}
+                <Text>{snap.notDoneNumber}</Text>
               </Boxes>
             )}
           </Wrap>
@@ -147,7 +121,6 @@ export default function Main({ data }) {
               fontFamily="body"
               fontSize={[10, 20, 35, 40]}
               align="center"
-              isTruncated
               textOverflow="ellipsis"
               overflow="hidden"
               textAlign="center"
@@ -175,4 +148,3 @@ export default function Main({ data }) {
   );
 }
 
-// text rotate(20deg)

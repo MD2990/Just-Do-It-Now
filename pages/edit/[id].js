@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { FaSave } from "react-icons/fa";
-
+var mongodb = require("mongodb");
 import {
   Button,
   VStack,
@@ -15,39 +15,37 @@ import { RiArrowGoBackLine } from "react-icons/ri";
 import state from "../../store";
 import { useToast } from "@chakra-ui/toast";
 
+import { MyToast } from "../../components/Util";
+import connectToDatabase from "../../util/mongodb";
+import { MySkeletons } from "../../components/MySkeletons";
 import { useSnapshot } from "valtio";
-import {
-  getLocalStorage,
-  MyToast,
-  removeLocalStorage,
-} from "../../components/Util";
 
-export default function Edit() {
+export default function Edit({ todo }) {
   const router = useRouter();
   const { id } = router.query;
   const toast = useToast({});
 
-  const snapshot = useSnapshot(state);
+  const snap= useSnapshot(state);
 
+  if (!todo?.name) return <MySkeletons />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const name = state.todoName;
 
     try {
       await fetch("/api/updateTodo?_id=" + id, {
         method: "PUT",
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name: state.todoName }),
         headers: {
           "Content-Type": "application/json",
         },
       }).then((response) => {
         if (response.ok) {
           MyToast({ toast: toast, update: true });
-          removeLocalStorage(id);
+
           router.back();
         } else {
-           MyToast({ toast: toast, error: true });
+          MyToast({ toast: toast, error: true });
         }
       });
     } catch (error) {
@@ -61,38 +59,28 @@ export default function Edit() {
       p={[2, 4, 8, 10]}
       mx={[2, 4, 8, 10]}
     >
-      <VStack align="center" justify="center" spacing={[2, 4, 6, 8]}>
+      <VStack align="center" justify="center" p="2">
         <Text
-          overflow="hidden"
-          textOverflow="ellipsis"
-          whiteSpace="nowrap"
           shadow="sm"
-          p="4"
+          noOfLines={1}
           textTransform="capitalize"
-          letterSpacing="wide"
-          fontSize="2xl"
+          fontSize={["sm", "lg", "2xl", "4xl"]}
           fontWeight="bold"
           color="teal.300"
-          mb="10%"
           textAlign="center"
         >
-          {snapshot.todoName}
+          {todo?.name}
         </Text>
         <Divider />
         <form onSubmit={handleSubmit}>
           <Input
-            isTruncated
             textOverflow="ellipsis"
             overflow="hidden"
-            fontSize="1.2rem"
-            rounded="full"
+            fontSize={["sm", "md", "lg"]}
+            size={["xs", "sm", "md", "lg"]}
+            rounded="md"
             textAlign="center"
-            size="lg"
-            defaultValue={
-              snapshot.todoName ||
-              getLocalStorage(id) 
-              
-            }
+            defaultValue={todo?.name}
             isRequired
             shadow="2xl"
             errorBorderColor="teal.300"
@@ -101,30 +89,29 @@ export default function Edit() {
           <Center>
             <Wrap m="4" justify="center">
               <Button
-                isDisabled={snapshot.todoName.length < 1}
-                type="submit"
                 shadow="2xl"
-                fontSize="1.2rem"
-                size="lg"
+                fontSize={["sm", "md", "lg"]}
+                size={["xs", "sm", "md", "lg"]}
                 rounded="full"
                 colorScheme="teal"
-                leftIcon={<FaSave fontSize="2.1rem" />}
-              >
-                Edit & Save
-              </Button>
-
-              <Button
-                shadow="2xl"
-                fontSize="1.2rem"
-                size="lg"
-                rounded="full"
-                colorScheme="teal"
-                leftIcon={<RiArrowGoBackLine fontSize="2.1rem" />}
+                leftIcon={<RiArrowGoBackLine />}
                 onClick={() => {
-                     removeLocalStorage(id);
-                  router.back();}}
+                  router.back();
+                }}
               >
                 Cancel
+              </Button>
+              <Button
+                isDisabled={snap.todoName.length < 1}
+                type="submit"
+                shadow="2xl"
+                fontSize={["sm", "md", "lg"]}
+                size={["xs", "sm", "md", "lg"]}
+                rounded="full"
+                colorScheme="teal"
+                leftIcon={<FaSave />}
+              >
+                Edit & Save
               </Button>
             </Wrap>
           </Center>
@@ -132,4 +119,39 @@ export default function Edit() {
       </VStack>
     </Center>
   );
+}
+
+export async function getStaticProps({ params }) {
+  const { db } = await connectToDatabase();
+  const data = await db
+    .collection("todo")
+    .findOne({ _id: mongodb.ObjectId(params.id) });
+
+  if (!data) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/error",
+      },
+    };
+  }
+  const todo = await JSON.parse(JSON.stringify(data));
+
+  return {
+    props: {
+      todo,
+    },
+    revalidate: 1,
+  };
+}
+export async function getStaticPaths() {
+  const { db } = await connectToDatabase();
+  const data = await db.collection("todo").find({}).toArray();
+
+  const todo = await JSON.parse(JSON.stringify(data));
+
+  const paths = todo.map((c) => ({
+    params: { id: c._id.toString() },
+  }));
+  return { paths, fallback: true };
 }
