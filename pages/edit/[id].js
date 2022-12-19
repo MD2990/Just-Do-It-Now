@@ -11,7 +11,9 @@ import {
   Wrap,
   Divider,
 } from "@chakra-ui/react";
-import { RiArrowGoBackLine } from "react-icons/ri";
+import {
+  RiArrowDropLeftLine,
+} from "react-icons/ri";
 import state from "../../store";
 import { useToast } from "@chakra-ui/toast";
 
@@ -25,7 +27,7 @@ export default function Edit({ todo }) {
   const { id } = router.query;
   const toast = useToast({});
 
-  const snap= useSnapshot(state);
+  const snap = useSnapshot(state);
 
   if (!todo?.name) return <MySkeletons />;
 
@@ -74,44 +76,45 @@ export default function Edit({ todo }) {
         <Divider />
         <form onSubmit={handleSubmit}>
           <Input
+            focusBorderColor="teal.300"
             textOverflow="ellipsis"
             overflow="hidden"
             fontSize={["sm", "md", "lg"]}
             size={["xs", "sm", "md", "lg"]}
-            rounded="md"
+            rounded="xl"
             textAlign="center"
             defaultValue={todo?.name}
             isRequired
             shadow="2xl"
-            errorBorderColor="teal.300"
+            errorBorderColor="red.300"
             onChange={(e) => (state.todoName = e.target.value)}
           />
           <Center>
             <Wrap m="4" justify="center">
-              <Button
-                shadow="2xl"
-                fontSize={["sm", "md", "lg"]}
-                size={["xs", "sm", "md", "lg"]}
-                rounded="full"
-                colorScheme="teal"
-                leftIcon={<RiArrowGoBackLine />}
-                onClick={() => {
-                  router.back();
-                }}
-              >
-                Cancel
-              </Button>
               <Button
                 isDisabled={snap.todoName.length < 1}
                 type="submit"
                 shadow="2xl"
                 fontSize={["sm", "md", "lg"]}
                 size={["xs", "sm", "md", "lg"]}
-                rounded="full"
+                rounded="xl"
                 colorScheme="teal"
                 leftIcon={<FaSave />}
               >
                 Edit & Save
+              </Button>
+              <Button
+                shadow="2xl"
+                fontSize={["sm", "md", "lg"]}
+                size={["xs", "sm", "md", "lg"]}
+                rounded="xl"
+                colorScheme="blackAlpha"
+                leftIcon={<RiArrowDropLeftLine />}
+                onClick={() => {
+                  router.back();
+                }}
+              >
+                Cancel
               </Button>
             </Wrap>
           </Center>

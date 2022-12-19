@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
 	await db
 		.collection('todo')
-		.updateOne({ _id: mongodb.ObjectId(id) }, { $set: { name: req.body.name } })
+		.updateOne({ _id: mongodb.ObjectId(id) }, { $set: { done: req.body.done } })
 		.then((obj) => {
 			res.json({ obj });
 		})

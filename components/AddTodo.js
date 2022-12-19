@@ -32,18 +32,17 @@ export default function AddTodo() {
           ? MyToast({ toast: toast, success: true })
           : MyToast({ toast: toast, error: true })
       )
-      .catch((err) => MyToast({ toast: toast, error: true }));
+      .catch(() => MyToast({ toast: toast, error: true }));
 
     // get the new data from db for ui to UI refresh insanely for best user experience
     const getData = await fetch("/api/todos").then((response) =>
       response.json()
     );
 
-    state.todos = getData.data; // update the state with the new data
-    state.total++; // update the total number of todos 
-    state.notDoneNumber++; // add the new todo to the total number of not done todos by default it is not done
+
+
     state.allTodos = getData.data; // update the copy state with the new data
-    
+    state.allData = getData.data; // update the copy state with the new data
   };
   return (
     <Center mt="5%" mb="1%">
@@ -51,6 +50,7 @@ export default function AddTodo() {
         <WrapItem>
           <form onSubmit={handleSubmit}>
             <Input
+              focusBorderColor="green.200"
               ref={ref}
               value={snap.newTodo}
               onChange={(e) => {
@@ -58,9 +58,9 @@ export default function AddTodo() {
               }}
               fontSize={["sm", "md", "lg"]}
               size={["xs", "sm", "md", "lg"]}
-              rounded="lg"
+              rounded="3xl"
               textAlign="center"
-              isInvalid
+              
               isRequired
               errorBorderColor="green.200"
               placeholder="Add New Todo"
@@ -74,7 +74,7 @@ export default function AddTodo() {
                 rounded="lg"
                 type="submit"
                 colorScheme="teal"
-                leftIcon={<MdAlarmAdd  />}
+                leftIcon={<MdAlarmAdd />}
               >
                 Add
               </Button>

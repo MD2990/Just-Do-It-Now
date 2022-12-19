@@ -1,5 +1,12 @@
-import { Box, Center, Text, Wrap, VStack, HStack } from "@chakra-ui/react";
-import { useEffect } from "react";
+import {
+  Box,
+  Center,
+  Text,
+  Wrap,
+  VStack,
+  HStack,
+} from "@chakra-ui/react";
+import { useCallback, useEffect } from "react";
 import { FcOk, FcSportsMode, FcTodoList } from "react-icons/fc";
 import { useSnapshot } from "valtio";
 import state from "../store";
@@ -9,28 +16,38 @@ import ShowTodo from "./ShowTodo";
 import { useBreakpointValue } from "@chakra-ui/media-query";
 import { Boxes } from "./Boxes";
 
-export default function Main({ data, done, notDone }) {
+export default function Main({
+  allTodos,
+  doneNumber,
+  notDoneNumber,
+  notDoneTodos,
+  doneTodos,
+}) {
   const size = "5rem";
   const Font_Size = () =>
     useBreakpointValue({ base: "3xl", lg: "9xl", md: "7xl", sm: "5xl" });
   const snap = useSnapshot(state);
 
+  const done = useCallback(() => {
+    getDone();
+  }, []);
+  const notDone = useCallback(() => {
+    getNotDone();
+  }, []);
+
   useEffect(() => {
     // save todos from server
-    state.todos = data;
+    state.allTodos = allTodos;
+    state.allData = allTodos;
+    // save todos from server
+    state.notDoneTodos = notDoneTodos;
+    // save todos from server
+    state.doneTodos = doneTodos;
 
     // get done todos
-    state.doneNumber = done;
-
-    // get not done todos
-    state.notDoneNumber = notDone;
-
-    // get total todos
-    state.total = data.length;
 
     // save a copy of todos to return back when user click  all todos button and also when change filter
-    state.allTodos = state.todos;
-  }, [data, done, notDone]);
+  }, [allTodos, doneNumber, doneTodos, notDoneNumber, notDoneTodos]);
 
   return (
     <Center m="4" p="4">
@@ -70,51 +87,45 @@ export default function Main({ data, done, notDone }) {
 
         <AddTodo />
 
-        {state.allTodos.length && (
+        {state.allData.length && (
           <Wrap justify="center">
             <Boxes
               color="blue.300"
-              filter={() => {
-                state.todos = state.allTodos;
+              onClick={() => {
+                state.allTodos = state.allData;
               }}
             >
               <FcTodoList size={size} />
 
-              <Text>{snap.total}</Text>
+              <Text>{snap.allData.length}</Text>
             </Boxes>
-
-            {snap.doneNumber > 0 && (
+            {doneLength(snap) ? (
               <Boxes
                 done
-                filter={() => {
-                  state.todos = state.allTodos;
-                  state.todos = state.todos.filter((t) => t.isDone);
+                onClick={() => {
+                  done();
                 }}
               >
                 <FcOk size={size} />
-                <Text>{snap.doneNumber}</Text>
+                <Text>{doneLength(snap)}</Text>
               </Boxes>
-            )}
+            ) : null}
 
-            {snap.notDoneNumber > 0 && (
+            {notDoneLength(snap) ? (
               <Boxes
                 notDone
-                filter={() => {
-                  // clear allTodos filter
-                  state.todos = state.allTodos;
-
-                  // filter notDone
-                  state.todos = state.todos.filter((t) => !t.isDone);
+                onClick={() => {
+                  notDone();
                 }}
               >
                 <FcSportsMode size={size} />
-                <Text>{snap.notDoneNumber}</Text>
+                <Text>{notDoneLength(snap)}</Text>
               </Boxes>
-            )}
+            ) : null}
           </Wrap>
         )}
 
-        {!snap.allTodos.length && (
+        {!snap.allData.length && (
           <Box pt="8">
             <Text
               fontWeight="bold"
@@ -148,3 +159,13 @@ export default function Main({ data, done, notDone }) {
   );
 }
 
+const getDone = () => (state.allTodos = state.allData.filter((t) => t.isDone));
+
+const getNotDone = () =>
+  (state.allTodos = state.allData.filter((t) => !t.isDone));
+function doneLength(snap) {
+  return snap.allData.filter((t) => t.isDone).length;
+}
+function notDoneLength(snap) {
+  return snap.allData.filter((t) => !t.isDone).length;
+}

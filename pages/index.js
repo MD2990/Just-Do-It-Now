@@ -3,8 +3,14 @@ import connectToDatabase from "../util/mongodb";
 import Main from "../components/Main";
 import { MySkeletons } from "../components/MySkeletons";
 
-export default function Home({ todo, done, notDone }) {
-  if (!todo) return <MySkeletons />;
+export default function Home({
+  allTodos,
+  doneNumber,
+  notDoneNumber,
+  notDoneTodos,
+  doneTodos,
+}) {
+  if (!allTodos) return <MySkeletons />;
 
   return (
     <>
@@ -12,7 +18,13 @@ export default function Home({ todo, done, notDone }) {
         <title>Just Do It </title>
       </Head>
 
-      <Main data={todo} done={done} notDone={notDone} />
+      <Main
+        allTodos={allTodos}
+        doneNumber={doneNumber}
+        notDoneNumber={notDoneNumber}
+        notDoneTodos={notDoneTodos}
+        doneTodos={doneTodos}
+      />
     </>
   );
 }
@@ -24,7 +36,9 @@ export async function getStaticProps() {
     .find({})
     .sort({ date: -1 })
     .toArray();
-  const done = await db.collection("todo").countDocuments({ isDone: true });
+  const doneNumber = await db
+    .collection("todo")
+    .countDocuments({ isDone: true });
 
   if (!data) {
     return {
@@ -34,15 +48,19 @@ export async function getStaticProps() {
       },
     };
   }
-  const todo = await JSON.parse(JSON.stringify(data));
+  const allTodos = await JSON.parse(JSON.stringify(data));
+  const notDoneTodos = allTodos.filter((todo) => !todo.isDone);
+  const doneTodos = allTodos.filter((todo) => todo.isDone);
 
-  const notDone = todo.length - done;
+  const notDoneNumber = allTodos.length - doneNumber;
 
   return {
     props: {
-      todo,
-      done,
-      notDone,
+      allTodos,
+      doneNumber,
+      notDoneNumber,
+      notDoneTodos,
+      doneTodos,
     },
     revalidate: 5,
   };

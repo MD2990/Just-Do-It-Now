@@ -12,10 +12,12 @@ export default async function handler(req, res) {
 			{ $set: { isDone: req.body.isDone } },
 		)
 		.then((obj) => {
+			
 			res.json({ obj });
 			//db.close();
 		})
 		.catch((err) => {
+			// eslint-disable-next-line no-console
 			console.log('Error: ' + err);
 		});
 }

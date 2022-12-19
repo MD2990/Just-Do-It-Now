@@ -1,10 +1,12 @@
 import { proxy } from "valtio";
 
 const state = proxy({
-  todos: [],
+  allTodos: [],
+  notDoneTodos: [],
+  doneTodos: [],
   todoName: "",
   newTodo: "",
-  allTodos: [],
+  allData:[],
   doneNumber: 0,
   notDoneNumber: 0,
   total: 0,

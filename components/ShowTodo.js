@@ -32,16 +32,17 @@ export default function ShowTodo() {
   const toast = useToast();
 
   return (
-    <Wrap justify="center" spacing="4">
-      {snap.todos.map((todo, index) => {
+    <Wrap justify="center" spacing={[1, 2, 3]} p={[1, 2, 3] } m={[1, 2, 3]}>
+      {snap.allTodos.map((todo, index) => {
         return (
-          <WrapItem key={todo._id}>
+          <WrapItem key={todo._id} >
             <Box
-              p="4"
+              p="2%"
+
               textAlign="center"
               maxW="fit-content"
               w={"full"}
-              bg={"white"}
+              bg={`${todo.isDone ? "green.50" : "red.50"}`}
               boxShadow={"2xl"}
               rounded={"md"}
               overflow={"hidden"}
@@ -52,6 +53,7 @@ export default function ShowTodo() {
                 bgGradient={`linear(to-r,${colors.green} , ${colors.blue})`}
                 w="full"
                 h="20"
+                
               ></Box>
               <Flex justify={"center"} mt={-12}>
                 <Avatar
@@ -65,24 +67,9 @@ export default function ShowTodo() {
                   bg="whitesmoke"
                   size={"xl"}
                   onClick={async () => {
-                    const done = (state.todos[index].isDone = !todo.isDone);
+                    const done = (state.allTodos[index].isDone = !todo.isDone);
 
-                    if (!todo.isDone) {
-                      state.doneNumber++;
-                      state.notDoneNumber--;
-                      state.todos = state.todos.filter((t) => !t.isDone);
-
-                      // if all are done,so we will show all with no filter
-                      if (state.todos.length === 0)
-                        state.todos = state.allTodos;
-                    } else {
-                      state.doneNumber--;
-                      state.notDoneNumber++;
-                      state.todos = state.todos.filter((t) => t.isDone);
-                      // if all are done,so we will show all with no filter
-                      if (state.todos.length === 0)
-                        state.todos = state.allTodos;
-                    }
+                 
 
                     await fetch("/api/doneTodo?_id=" + todo._id, {
                       method: "PUT",
@@ -90,7 +77,16 @@ export default function ShowTodo() {
                       headers: {
                         "Content-Type": "application/json",
                       },
-                    }).then((response) => response.json());
+                    })
+                      .then((res) => {
+                        if (res.status !== 200) {
+                          MyToast({ toast: toast, error: true });
+                        } else {
+                          MyToast({ toast: toast, update: true });
+                        }
+                      })
+
+                      .catch(() => MyToast({ toast: toast, error: true }));
                   }}
                   icon={
                     todo.isDone ? (
@@ -175,25 +171,12 @@ export default function ShowTodo() {
   );
 
   function handelDelete(todo) {
-    state.todos = state.todos.filter((to) => todo._id !== to._id);
+    state.allData = state.allTodos = state.allTodos.filter(
+      (to) => todo._id !== to._id
+    );
 
-    // filter todo List for a copy
-    state.allTodos = state.allTodos.filter((to) => todo._id !== to._id);
-
-    // if will not check the length the filter will return empty UI when a filter is applied and we delete the last todo
-    // now if we delete the last done todo the UI will jump to the undone todo list and vice versa
     // and if empty the UI will jump to the "Proactive and add some todos to your list " as simple msg
-    state.todos.length < 1 && (state.todos = state.allTodos);
-
-    // just for user experience and not  do some hard work here
-    state.total--;
-    // subtract the todo from the total of done todo if user delete  the done todo
-    if (!todo.isDone) {
-      state.notDoneNumber--;
-    } else {
-      // subtract the todo from the total of undone todo if user delete  the undone todo
-      state.doneNumber--;
-    }
+    state.allTodos.length < 1 && (state.allTodos = state.allData);
 
     fetch("/api/delTodo", {
       method: "DELETE",
@@ -206,15 +189,13 @@ export default function ShowTodo() {
         } else {
           MyToast({ toast: toast, error: true });
           // we must cancel the applied filter for UI and for a copy
-          state.todos = state.todos.filter((to) => to._id !== null);
-          state.allTodos = state.allTodos.filter((to) => to._id !== null);
+          state.allTodos = state.allData.filter((to) => to._id !== null);
         }
       })
-      .catch((error) => {
+      .catch(() => {
         MyToast({ toast: toast, error: true });
         // we must cancel the applied filter for UI and for a copy
-        state.todos = state.todos.filter((to) => to._id !== null);
-        state.allTodos = state.allTodos.filter((to) => to._id !== null);
+        state.allTodos = state.allData.filter((to) => to._id !== null);
       });
   }
 }
@@ -224,4 +205,3 @@ function handelEdit(todo, router) {
     router.push(`/edit/${todo._id}`);
   };
 }
-
