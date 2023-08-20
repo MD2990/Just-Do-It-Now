@@ -52,9 +52,6 @@ devDependencies:
   eslint-plugin-valtio:
     specifier: ^0.6.2
     version: 0.6.2
-  yarn-upgrade-all:
-    specifier: ^0.7.2
-    version: 0.7.2
 
 packages:
 
@@ -3947,11 +3944,6 @@ packages:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
     dev: false
-
-  /yarn-upgrade-all@0.7.2:
-    resolution: {integrity: sha512-iVxmoBuNdpxeahAIehJ039Pp6S8zQ/qTENQRMV5hp7x/2tLGUzytCODIKZFjfUwcRRKT3boGgHheUEWC7+VlQw==}
-    hasBin: true
-    dev: true
 
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
