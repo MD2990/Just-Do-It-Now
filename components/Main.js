@@ -1,11 +1,4 @@
-import {
-  Box,
-  Center,
-  Text,
-  Wrap,
-  VStack,
-  HStack,
-} from "@chakra-ui/react";
+import { Box, Center, Text, Wrap, VStack, HStack } from "@chakra-ui/react";
 import { useCallback, useEffect } from "react";
 import { FcOk, FcSportsMode, FcTodoList } from "react-icons/fc";
 import { useSnapshot } from "valtio";
@@ -13,7 +6,6 @@ import state from "../store";
 import { colors } from "../lib/constent";
 import AddTodo from "./AddTodo";
 import ShowTodo from "./ShowTodo";
-import { useBreakpointValue } from "@chakra-ui/media-query";
 import { Boxes } from "./Boxes";
 
 export default function Main({
@@ -24,8 +16,7 @@ export default function Main({
   doneTodos,
 }) {
   const size = "5rem";
-  const Font_Size = () =>
-    useBreakpointValue({ base: "3xl", lg: "9xl", md: "7xl", sm: "5xl" });
+  const Font_Size = ["md", "lg", "3xl", "4xl", "5xl"];
   const snap = useSnapshot(state);
 
   const done = useCallback(() => {
@@ -52,36 +43,18 @@ export default function Main({
   return (
     <Center m="4" p="4">
       <VStack>
-        <HStack>
+        <HStack p="2" m="2" mb="-4%" justify={"center"} align={"center"}>
           <Text
+            p="2"
+            m="2"
+            textShadow={`0px 0px 8px  green`}
+            noOfLines={1}
             as="span"
             fontSize={Font_Size}
-            transform="rotate(-20deg)"
             fontWeight="bold"
             color={colors.green}
           >
-            J
-          </Text>
-          <Text
-            mb="1"
-            ml="0.9%"
-            letterSpacing="wider"
-            fontSize={["md", "lg", "3xl", "4xl"]}
-            fontWeight="bold"
-            color={colors.green}
-            textOverflow="ellipsis"
-            fontFamily="sans-serif"
-          >
-            UST DO I
-          </Text>
-          <Text
-            as="span"
-            fontSize={Font_Size}
-            transform="rotate(20deg)"
-            fontWeight="bold"
-            color={colors.green}
-          >
-            T
+            Just Do It
           </Text>
         </HStack>
 

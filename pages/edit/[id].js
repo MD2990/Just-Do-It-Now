@@ -11,9 +11,6 @@ import {
   Wrap,
   Divider,
 } from "@chakra-ui/react";
-import {
-  RiArrowDropLeftLine,
-} from "react-icons/ri";
 import state from "../../store";
 import { useToast } from "@chakra-ui/toast";
 
@@ -109,7 +106,6 @@ export default function Edit({ todo }) {
                 size={["xs", "sm", "md", "lg"]}
                 rounded="xl"
                 colorScheme="blackAlpha"
-                leftIcon={<RiArrowDropLeftLine />}
                 onClick={() => {
                   router.back();
                 }}
@@ -128,7 +124,7 @@ export async function getStaticProps({ params }) {
   const { db } = await connectToDatabase();
   const data = await db
     .collection("todo")
-    .findOne({ _id: mongodb.ObjectId(params.id) });
+    .findOne({ _id: new mongodb.ObjectId(params.id) });
 
   if (!data) {
     return {
