@@ -1,7 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
 import { FaSave } from "react-icons/fa";
-var mongodb = require("mongodb");
 import {
   Button,
   VStack,
@@ -13,20 +12,15 @@ import {
 } from "@chakra-ui/react";
 import state from "../../store";
 import { useToast } from "@chakra-ui/toast";
-
 import { MyToast } from "../../components/Util";
-import connectToDatabase from "../../util/mongodb";
-import { MySkeletons } from "../../components/MySkeletons";
 import { useSnapshot } from "valtio";
 
-export default function Edit({ todo }) {
+export default function Edit({ todo,id }) {
   const router = useRouter();
-  const { id } = router.query;
   const toast = useToast({});
 
   const snap = useSnapshot(state);
 
-  if (!todo?.name) return <MySkeletons />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -120,37 +114,3 @@ export default function Edit({ todo }) {
   );
 }
 
-export async function getStaticProps({ params }) {
-  const { db } = await connectToDatabase();
-  const data = await db
-    .collection("todo")
-    .findOne({ _id: new mongodb.ObjectId(params.id) });
-
-  if (!data) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/error",
-      },
-    };
-  }
-  const todo = await JSON.parse(JSON.stringify(data));
-
-  return {
-    props: {
-      todo,
-    },
-    revalidate: 1,
-  };
-}
-export async function getStaticPaths() {
-  const { db } = await connectToDatabase();
-  const data = await db.collection("todo").find({}).toArray();
-
-  const todo = await JSON.parse(JSON.stringify(data));
-
-  const paths = todo.map((c) => ({
-    params: { id: c._id.toString() },
-  }));
-  return { paths, fallback: true };
-}

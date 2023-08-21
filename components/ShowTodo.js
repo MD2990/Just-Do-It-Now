@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/layout";
 import { useBreakpointValue } from "@chakra-ui/media-query";
 import { useToast } from "@chakra-ui/toast";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { FcAlarmClock, FcCheckmark } from "react-icons/fc";
 import { useSnapshot } from "valtio";

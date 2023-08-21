@@ -1,3 +1,4 @@
+
 import {
   Box,
   Center,
@@ -7,7 +8,7 @@ import {
   Wrap,
 } from "@chakra-ui/react";
 
-export function MySkeletons() {
+export default function MySkeletons() {
   const Skeletons = () => (
     <Box padding="4" boxShadow="lg" bg="white" borderRadius="2xl">
       <Skeleton
