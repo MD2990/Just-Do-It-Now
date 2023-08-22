@@ -3,11 +3,11 @@ import { Box, Center, Text, Wrap, VStack, HStack } from "@chakra-ui/react";
 import { useCallback, useEffect } from "react";
 import { FcOk, FcSportsMode, FcTodoList } from "react-icons/fc";
 import { useSnapshot } from "valtio";
-import state from "@store";
 import { colors } from "@lib/constent";
 import AddTodo from "@components/AddTodo";
 import { Boxes } from "@components/Boxes";
 import ShowTodo from "@components/ShowTodo";
+import state from "@components/store";
 
 export default function Main({
   allTodos,
@@ -100,29 +100,22 @@ export default function Main({
         )}
 
         {!snap.allData.length && (
-          <Box pt="8">
+          <Box p={[1, 2, 3, 4]} rounded={"md"} userSelect={"none"}>
             <Text
               fontWeight="bold"
               fontFamily="body"
-              fontSize={[10, 20, 35, 40]}
+              fontSize={[8, 20, 35, 40]}
               align="center"
-              textOverflow="ellipsis"
-              overflow="hidden"
               textAlign="center"
               color="green.400"
               textShadow="0px 0px 80px  green"
-              whiteSpace="nowrap"
-              p="2"
+              noOfLines={1}
             >
-              <Text
-                as="span"
-                fontSize={[30, 40, 65, 90]}
-                transform="rotate(-200deg)"
-              >
+              <Text as="span" fontSize={[10, 40, 65, 75]}>
                 Be
               </Text>
               {"   "}
-              Proactive and add some todos to your list{" "}
+              Proactive and add some todos to your list and achieve your goals
             </Text>
           </Box>
         )}

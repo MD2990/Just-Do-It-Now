@@ -11,8 +11,8 @@ import {
   Wrap,
   Divider,
 } from "@chakra-ui/react";
-import state from "@store";
-import { useToast } from "@chakra-ui/toast";
+import state from "@components/store";
+import { useToast } from "@chakra-ui/react";
 import { MyToast } from "@components/Util";
 import { useSnapshot } from "valtio";
 

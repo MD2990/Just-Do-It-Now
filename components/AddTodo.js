@@ -6,7 +6,7 @@ import React, { useRef } from "react";
 import { MdAlarmAdd } from "react-icons/md";
 import { useSnapshot } from "valtio";
 import { getDate } from "../lib/constent";
-import state from "../store";
+import state from "./store";
 import { MyToast } from "./Util";
 import { useRouter } from "next/navigation";
 
@@ -38,8 +38,7 @@ export default function AddTodo() {
       .catch(() => MyToast({ toast: toast, error: true }));
 
     // get the new data from db for ui to UI refresh insanely for best user experience
- 
-      router.refresh();
+    router.refresh();
   };
   return (
     <Center mt="5%" mb="1%">

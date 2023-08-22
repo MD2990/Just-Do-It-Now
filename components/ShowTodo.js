@@ -17,7 +17,7 @@ import React from "react";
 import { FcAlarmClock, FcCheckmark } from "react-icons/fc";
 import { useSnapshot } from "valtio";
 import { colors } from "../lib/constent";
-import state from "../store";
+import state from "./store";
 import { MyToast } from "./Util";
 
 export default function ShowTodo() {
@@ -64,7 +64,7 @@ export default function ShowTodo() {
                   p="3"
                   bg="whitesmoke"
                   size={"xl"}
-                  onClick={handleDone({ index, todo, toast,router })}
+                  onClick={handleDone({ index, todo, toast, router })}
                   icon={
                     todo.isDone ? (
                       <FcCheckmark fontSize="5.5rem" />
@@ -177,7 +177,7 @@ export default function ShowTodo() {
       });
   }
 }
-function handleDone({ index, todo, toast ,router}) {
+function handleDone({ index, todo, toast, router }) {
   return async () => {
     const ip = process.env.NEXT_PUBLIC_VERCEL_URL;
     const done = (state.allTodos[index].isDone = !todo.isDone);

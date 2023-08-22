@@ -1,4 +1,4 @@
-import connectToDatabase from "@util/mongodb";
+import connectToDatabase from "app/mongodb";
 import { NextResponse } from "next/server";
 const mongodb = require("mongodb");
 

@@ -1,17 +1,34 @@
 import React from "react";
 import Main from "./Main";
+import connectToDatabase from "./mongodb";
+export const dynamic = "force-dynamic";
+
 async function getData() {
-  const data = await fetch(
-    `${process.env.NEXT_PUBLIC_VERCEL_URL}/api`,
+  const { db } = await connectToDatabase();
 
-    {
-      cache: "no-cache",
-    }
-  );
-  const { allTodos, doneNumber, notDoneNumber, notDoneTodos, doneTodos } =
-    await data.json();
+  const data = await db
+    .collection("todo")
+    .find({})
+    .sort({ date: -1 })
+    .toArray();
 
-  return { allTodos, doneNumber, notDoneNumber, notDoneTodos, doneTodos };
+  const allTodos = (await JSON.parse(JSON.stringify(data))) || [];
+
+  const doneNumber = await db
+    .collection("todo")
+    .countDocuments({ isDone: true });
+  const notDoneTodos = allTodos.filter((todo) => !todo.isDone) || [];
+  const doneTodos = allTodos.filter((todo) => todo.isDone) || [];
+
+  const notDoneNumber = allTodos.length - doneNumber || 0;
+
+  return {
+    allTodos,
+    doneNumber,
+    notDoneNumber,
+    notDoneTodos,
+    doneTodos,
+  };
 }
 
 export default async function page() {
