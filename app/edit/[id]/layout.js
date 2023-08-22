@@ -1,6 +1,6 @@
 import connectToDatabase from "@util/mongodb";
 import React from "react";
-var mongodb = require("mongodb");
+const mongodb = require("mongodb");
 import { redirect } from "next/navigation";
 import Edit from "./edit";
 
@@ -24,6 +24,8 @@ async function getById(id) {
 
   return todo;
 }
+
+
 
 export default async function Layout({ params }) {
   const { id } = params;

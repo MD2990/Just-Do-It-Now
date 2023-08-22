@@ -8,19 +8,22 @@ import { useSnapshot } from "valtio";
 import { getDate } from "../lib/constent";
 import state from "../store";
 import { MyToast } from "./Util";
+import { useRouter } from "next/navigation";
 
 export default function AddTodo() {
   const snap = useSnapshot(state);
   const ref = useRef("");
   const toast = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
+    const ip = process.env.NEXT_PUBLIC_VERCEL_URL;
     e.preventDefault();
 
     const names = state.newTodo; // get the new todo name before clearing it
     state.newTodo = ""; // rest input
 
-    await fetch("/api/addTodo", {
+    await fetch(`${ip}/api`, {
       // send the new todo to the server
       // post request
       method: "POST",
@@ -35,14 +38,8 @@ export default function AddTodo() {
       .catch(() => MyToast({ toast: toast, error: true }));
 
     // get the new data from db for ui to UI refresh insanely for best user experience
-    const getData = await fetch("/api/todos").then((response) =>
-      response.json()
-    );
-
-
-
-    state.allTodos = getData.data; // update the copy state with the new data
-    state.allData = getData.data; // update the copy state with the new data
+ 
+      router.refresh();
   };
   return (
     <Center mt="5%" mb="1%">
@@ -60,7 +57,6 @@ export default function AddTodo() {
               size={["xs", "sm", "md", "lg"]}
               rounded="3xl"
               textAlign="center"
-              
               isRequired
               errorBorderColor="green.200"
               placeholder="Add New Todo"

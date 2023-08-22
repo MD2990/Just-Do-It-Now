@@ -10,7 +10,7 @@ import { Boxes } from "@components/Boxes";
 import ShowTodo from "@components/ShowTodo";
 
 export default function Main({
-  allTodos ,
+  allTodos,
   doneNumber,
   notDoneNumber,
   notDoneTodos,

@@ -10,7 +10,6 @@ export const Boxes = ({
   <WrapItem onClick={onClick} cursor="pointer" >
     <VStack
       bg={`${done ? "green.50" : notDone ? "red.50" : "null"}`}
-    
       userSelect="none"
       justify="center"
       align="center"

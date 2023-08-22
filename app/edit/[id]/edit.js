@@ -6,7 +6,7 @@ import {
   Button,
   VStack,
   Center,
-  Input,
+  Textarea,
   Text,
   Wrap,
   Divider,
@@ -23,6 +23,7 @@ export default function Edit({ todo, id }) {
   const snap = useSnapshot(state);
 
   const handleSubmit = async (e) => {
+    state.isLoading = true;
     e.preventDefault();
     const ip = process.env.NEXT_PUBLIC_VERCEL_URL;
 
@@ -36,14 +37,16 @@ export default function Edit({ todo, id }) {
       }).then((response) => {
         if (response.ok) {
           MyToast({ toast: toast, update: true });
+          router.refresh();
           router.replace("/");
         } else {
           MyToast({ toast: toast, error: true });
         }
       });
     } catch (error) {
-      console.log(error);
       MyToast({ toast: toast, error: true });
+    } finally {
+      state.isLoading = false;
     }
   };
 
@@ -63,18 +66,19 @@ export default function Edit({ todo, id }) {
           color="teal.300"
           textAlign="center"
         >
-          {todo?.name}
+          {todo?.name?.length > 10
+            ? todo?.name.slice(0, 10) + "..."
+            : todo?.name}
         </Text>
         <Divider />
         <form onSubmit={handleSubmit}>
-          <Input
+          <Textarea
             focusBorderColor="teal.300"
             textOverflow="ellipsis"
             overflow="hidden"
             fontSize={["sm", "md", "lg"]}
             size={["xs", "sm", "md", "lg"]}
             rounded="xl"
-            textAlign="center"
             defaultValue={todo?.name}
             isRequired
             shadow="2xl"
@@ -84,7 +88,8 @@ export default function Edit({ todo, id }) {
           <Center>
             <Wrap m="4" justify="center">
               <Button
-                isDisabled={snap.todoName.length < 1}
+                isDisabled={snap.todoName?.trim()?.length < 1}
+                isLoading={snap.isLoading}
                 type="submit"
                 shadow="2xl"
                 fontSize={["sm", "md", "lg"]}
@@ -92,10 +97,12 @@ export default function Edit({ todo, id }) {
                 rounded="xl"
                 colorScheme="teal"
                 leftIcon={<FaSave />}
+           
               >
                 Edit & Save
               </Button>
               <Button
+              display={snap.isLoading ? "none" : "block"}
                 shadow="2xl"
                 fontSize={["sm", "md", "lg"]}
                 size={["xs", "sm", "md", "lg"]}

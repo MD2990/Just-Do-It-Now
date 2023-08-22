@@ -32,13 +32,12 @@ export default function ShowTodo() {
   const toast = useToast();
 
   return (
-    <Wrap justify="center" spacing={[1, 2, 3]} p={[1, 2, 3] } m={[1, 2, 3]}>
+    <Wrap justify="center" spacing={[1, 2, 3]} p={[1, 2, 3]} m={[1, 2, 3]}>
       {snap.allTodos.map((todo, index) => {
         return (
-          <WrapItem key={todo._id} >
+          <WrapItem key={todo._id}>
             <Box
               p="2%"
-
               textAlign="center"
               maxW="fit-content"
               w={"full"}
@@ -53,7 +52,6 @@ export default function ShowTodo() {
                 bgGradient={`linear(to-r,${colors.green} , ${colors.blue})`}
                 w="full"
                 h="20"
-                
               ></Box>
               <Flex justify={"center"} mt={-12}>
                 <Avatar
@@ -66,28 +64,7 @@ export default function ShowTodo() {
                   p="3"
                   bg="whitesmoke"
                   size={"xl"}
-                  onClick={async () => {
-                    const done = (state.allTodos[index].isDone = !todo.isDone);
-
-                 
-
-                    await fetch("/api/doneTodo?_id=" + todo._id, {
-                      method: "PUT",
-                      body: JSON.stringify({ isDone: done }),
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                    })
-                      .then((res) => {
-                        if (res.status !== 200) {
-                          MyToast({ toast: toast, error: true });
-                        } else {
-                          MyToast({ toast: toast, update: true });
-                        }
-                      })
-
-                      .catch(() => MyToast({ toast: toast, error: true }));
-                  }}
+                  onClick={handleDone({ index, todo, toast,router })}
                   icon={
                     todo.isDone ? (
                       <FcCheckmark fontSize="5.5rem" />
@@ -147,7 +124,7 @@ export default function ShowTodo() {
                       transform: "translateY(-2px)",
                       boxShadow: "lg",
                     }}
-                    onClick={handelEdit(todo, router)}
+                    onClick={handelEdit({ todo, router })}
                   >
                     Edit
                   </Button>
@@ -171,6 +148,7 @@ export default function ShowTodo() {
   );
 
   function handelDelete(todo) {
+    const ip = process.env.NEXT_PUBLIC_VERCEL_URL;
     state.allData = state.allTodos = state.allTodos.filter(
       (to) => todo._id !== to._id
     );
@@ -178,14 +156,14 @@ export default function ShowTodo() {
     // and if empty the UI will jump to the "Proactive and add some todos to your list " as simple msg
     state.allTodos.length < 1 && (state.allTodos = state.allData);
 
-    fetch("/api/delTodo", {
+    fetch(`${ip}/api?id=${todo._id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(todo._id),
     })
       .then((response) => {
         if (response.ok) {
           MyToast({ toast: toast, deleted: true });
+          router.refresh();
         } else {
           MyToast({ toast: toast, error: true });
           // we must cancel the applied filter for UI and for a copy
@@ -199,9 +177,32 @@ export default function ShowTodo() {
       });
   }
 }
-function handelEdit(todo, router) {
+function handleDone({ index, todo, toast ,router}) {
+  return async () => {
+    const ip = process.env.NEXT_PUBLIC_VERCEL_URL;
+    const done = (state.allTodos[index].isDone = !todo.isDone);
+    await fetch(`${ip}/api?id=${todo._id}`, {
+      method: "PUT",
+      body: JSON.stringify({ isDone: done }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (res.status !== 200) {
+          MyToast({ toast: toast, error: true });
+          router.refresh();
+        } else {
+          MyToast({ toast: toast, update: true });
+        }
+      })
+
+      .catch(() => MyToast({ toast: toast, error: true }));
+  };
+}
+
+function handelEdit({ todo, router }) {
   return () => {
-    state.todoName = todo.name;
     router.push(`/edit/${todo._id}`);
   };
 }

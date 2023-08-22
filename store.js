@@ -10,6 +10,7 @@ const state = proxy({
   doneNumber: 0,
   notDoneNumber: 0,
   total: 0,
+  isLoaded: false,
 });
 
 export default state;

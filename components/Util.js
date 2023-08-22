@@ -1,35 +1,8 @@
-import { Box, Center } from "@chakra-ui/layout";
+import { Box } from "@chakra-ui/layout";
 import { Text } from "@chakra-ui/react";
-import { useRouter } from "next/router";
 import React from "react";
 
-export function Error() {
-  const router = useRouter();
-  return (
-    <Center
-      mt="20%"
-      p="4"
-      mx="4"
-      onClick={() => router.replace("/")}
-      cursor="pointer"
-    >
-      <Text
-        fontFamily="monospace"
-        fontSize={["xs", "sm", "md", "xl", "3xl"]}
-        overflowWrap="break-word"
-        textAlign="center"
-        color="gray.400"
-        fontWeight="extrabold"
-        userSelect="none"
-        textShadow="0 0 15px gray"
-        textOverflow="ellipsis"
-        whiteSpace="nowrap"
-      >
-        Error loading data from server please try again later ...
-      </Text>
-    </Center>
-  );
-}
+
 
 export function MyToast({
   toast,
