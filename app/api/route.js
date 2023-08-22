@@ -71,37 +71,3 @@ export async function POST(request) {
     return NextResponse.error({ error: error.message, status: 500 });
   }
 }
-
-// Get all todos
-
-export async function GET() {
-  try {
-    const { db } = await connectToDatabase();
-
-    const data = await db
-      .collection("todo")
-      .find({})
-      .sort({ date: -1 })
-      .toArray();
-
-    const allTodos = (await JSON.parse(JSON.stringify(data))) || [];
-
-    const doneNumber = await db
-      .collection("todo")
-      .countDocuments({ isDone: true });
-    const notDoneTodos = allTodos.filter((todo) => !todo.isDone) || [];
-    const doneTodos = allTodos.filter((todo) => todo.isDone) || [];
-
-    const notDoneNumber = allTodos.length - doneNumber || 0;
-
-    return NextResponse.json({
-      allTodos,
-      doneNumber,
-      notDoneNumber,
-      notDoneTodos,
-      doneTodos,
-    });
-  } catch (error) {
-    return NextResponse.error({ error: error.message, status: 500 });
-  }
-}
